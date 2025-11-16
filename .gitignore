@@ -1,8 +1,11 @@
-HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
+logs/
+.mvn/
+.mvnw/
+!.mvn/wrapper/**
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.log
 
 ### STS ###
 .apt_generated
@@ -31,11 +34,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-
-.log
-/logs/user-service.log
-/logs/user-service-spring.log
-/logs/user-service-spring.log.2025-11-06.0.gz
-/logs/user-service-spring.log.2025-11-07.0.gz
-/logs/user-service-spring.log.2025-11-08.0.gz

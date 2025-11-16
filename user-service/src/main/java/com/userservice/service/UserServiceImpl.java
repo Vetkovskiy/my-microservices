@@ -1,11 +1,13 @@
 package com.userservice.service;
 
 import com.userservice.dto.UserCreateDTO;
+import com.userservice.dto.UserEventDTO;
 import com.userservice.dto.UserResponseDTO;
 import com.userservice.dto.UserUpdateDTO;
 import com.userservice.entity.UserEntity;
 import com.userservice.exception.DuplicateResourceException;
 import com.userservice.exception.ResourceNotFoundException;
+import com.userservice.kafka.KafkaProducer;
 import com.userservice.mapper.UserMapper;
 import com.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final KafkaProducer eventProducer;
 
     @Override
     @Transactional
@@ -43,6 +46,12 @@ public class UserServiceImpl implements UserService {
         UserEntity savedUser = userRepository.save(createdUser);
 
         log.info("User created successfully with id: {}", savedUser.getId());
+
+        UserEventDTO event = UserEventDTO.builder()
+                .email(savedUser.getEmail())
+                .eventType(UserEventDTO.EventType.CREATED)
+                .build();
+        eventProducer.sendUserEvent(event);
 
         return userMapper.ofEntity(savedUser);
     }
@@ -97,8 +106,15 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
+        String userEmail = user.getEmail();
         userRepository.delete(user);
         log.info("User deleted successfully with id: {}", id);
+
+        UserEventDTO event = UserEventDTO.builder()
+                .email(userEmail)
+                .eventType(UserEventDTO.EventType.DELETED)
+                .build();
+        eventProducer.sendUserEvent(event);
     }
 
     @Override
