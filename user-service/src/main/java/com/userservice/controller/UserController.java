@@ -48,7 +48,7 @@ public class UserController {
 
     /**
      * Получить пользователя по ID
-     * GET /api/users/v1/{id}
+     * GET /api/v1/users/{id}
      */
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(
@@ -62,7 +62,7 @@ public class UserController {
 
     /**
      * Получить всех пользователей
-     * GET /api/users
+     * GET /api/v1/users/
      */
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
@@ -75,7 +75,7 @@ public class UserController {
 
     /**
      * Обновить пользователя
-     * PUT /api/users/{id}
+     * PUT /api/v1/users/{id}
      */
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id,

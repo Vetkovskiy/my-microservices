@@ -136,7 +136,9 @@
                     </annotationProcessorPaths>
                     <source>9</source>
                     <target>9</target>
-
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 
@@ -146,7 +148,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.4</version>
                 <configuration>
-                    <!-- Разделение unit и integration тестов -->
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>

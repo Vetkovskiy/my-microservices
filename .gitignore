@@ -34,3 +34,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/notification-service/src/main/resources/application-local-secret.properties
