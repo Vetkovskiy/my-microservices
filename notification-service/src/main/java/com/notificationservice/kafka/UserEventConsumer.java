@@ -1,7 +1,7 @@
 package com.notificationservice.kafka;
 
 import com.notificationservice.dto.UserEventDTO;
-import com.notificationservice.service.EmailService;
+import com.notificationservice.service.EmailSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UserEventConsumer {
 
-    private final EmailService emailService;
+    private final EmailSender emailSender;
 
     @KafkaListener(
             topics = "${kafka.topic.user-events}",
@@ -26,7 +26,7 @@ public class UserEventConsumer {
                 event.getEventType(), event.getEmail());
 
         try {
-            emailService.sendUserEventEmail(event);
+            emailSender.sendUserEventEmail(event);
         } catch (Exception e) {
             log.error("Failed to process event: {}", event, e);
         }
