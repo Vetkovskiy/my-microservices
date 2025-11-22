@@ -30,6 +30,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * REST-контроллер для управления пользователями.
+ * Использует HATEOAS для добавления ссылок в ответы.
+ * Документируется через Swagger/OpenAPI.
  */
 @RestController
 @RequestMapping("/api/v1/users")
