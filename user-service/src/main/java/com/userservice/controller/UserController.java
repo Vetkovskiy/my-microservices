@@ -3,17 +3,15 @@ package com.userservice.controller;
 import com.userservice.dto.UserCreateDTO;
 import com.userservice.dto.UserResponseDTO;
 import com.userservice.dto.UserUpdateDTO;
+import com.userservice.hateoas.UserModelAssembler;
 import com.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,77 +19,65 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 /**
- * REST-контроллер для управления пользователями.
+ * Реализация спецификации UserControllerApi.
+ * Использует HATEOAS для добавления ссылок в ответы.
  */
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Slf4j
-public class UserController {
+public class UserController implements UserControllerApi {
 
     private final UserService userService;
+    private final UserModelAssembler userModelAssembler;
 
-    /**
-     * Создать нового пользователя
-     * POST /api/v1/users
-     */
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(
+    public ResponseEntity<EntityModel<UserResponseDTO>> createUser(
             @Valid @RequestBody UserCreateDTO request) {
 
         log.debug("REST request to create user: {}", request.getEmail());
         UserResponseDTO created = userService.createUser(request);
+        EntityModel<UserResponseDTO> model = userModelAssembler.toModel(created);
 
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+        return ResponseEntity
+                .created(linkTo(methodOn(UserController.class).getUserById(created.getId())).toUri())
+                .body(model);
     }
 
-    /**
-     * Получить пользователя по ID
-     * GET /api/v1/users/{id}
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(
+    public ResponseEntity<EntityModel<UserResponseDTO>> getUserById(
             @PathVariable Long id) {
 
         log.debug("REST request to get user by id: {}", id);
         UserResponseDTO user = userService.getUserById(id);
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userModelAssembler.toModel(user));
     }
 
-    /**
-     * Получить всех пользователей
-     * GET /api/v1/users/
-     */
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+    public ResponseEntity<CollectionModel<EntityModel<UserResponseDTO>>> getAllUsers() {
 
         log.debug("REST request to get all users");
-        List<UserResponseDTO> users = userService.getAllUsers();
+        List<EntityModel<UserResponseDTO>> users = userService.getAllUsers().stream()
+                .map(userModelAssembler::toModel)
+                .toList();
 
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(CollectionModel.of(users,
+                linkTo(methodOn(UserController.class).getAllUsers()).withSelfRel()));
+
     }
 
-    /**
-     * Обновить пользователя
-     * PUT /api/v1/users/{id}
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id,
-            @Valid @RequestBody UserUpdateDTO request) {
+    public ResponseEntity<EntityModel<UserResponseDTO>> updateUser(@PathVariable Long id,
+                                                                   @Valid @RequestBody UserUpdateDTO request) {
 
         log.debug("REST request to update user with id: {}", id);
         UserResponseDTO updated = userService.updateUser(id, request);
+        EntityModel<UserResponseDTO> model = userModelAssembler.toModel(updated);
 
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(model);
     }
 
-    /**
-     * Удалить пользователя
-     * DELETE /api/v1/users/{id}
-     */
-    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(
             @PathVariable Long id) {
 
@@ -101,11 +87,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Проверить существование email
-     * GET /api/v1/users/exists?email=test@example.com
-     */
-    @GetMapping("/exists")
     public ResponseEntity<Boolean> existsByEmail(
             @RequestParam String email) {
 
