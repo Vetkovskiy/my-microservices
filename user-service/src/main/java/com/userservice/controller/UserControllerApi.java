@@ -68,7 +68,8 @@ public interface UserControllerApi {
      */
     @Operation(
             summary = "Удалить пользователя по ID",
-            description = "Удаляет пользователя с указанным идентификатором. Возвращает статус 204 No Content при успешном удалении."
+            description = "Удаляет пользователя с указанным идентификатором." +
+                    "Возвращает статус 204 No Content при успешном удалении."
     )
     @DeleteMapping("/{id}")
     ResponseEntity<Void> deleteUser(@PathVariable Long id);
