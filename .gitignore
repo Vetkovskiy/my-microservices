@@ -34,4 +34,10 @@ build/
 
 ### VS Code ###
 .vscode/
-/notification-service/src/main/resources/application-local-secret.properties
+/notification-service/src/main/resources/application-local.yml
+/discovery-service/mvnw.cmd
+/config-server/mvnw.cmd
+/api-gateway/mvnw.cmd
+/discovery-service/mvnw
+/config-server/mvnw
+/api-gateway/mvnw
