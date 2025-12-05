@@ -1,9 +1,5 @@
-FROM maven:3.9.11-amazoncorretto-25-alpine AS build
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
-
-FROM amazoncorretto:25-alpine
-WORKDIR /app
-COPY --from=build /app/target/user-service.jar app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
+COPY target/*.jar app.jar
+EXPOSE 8888
+ENTRYPOINT ["java", "-jar", "app.jar"]
