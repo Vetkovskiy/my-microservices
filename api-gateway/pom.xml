@@ -11,10 +11,6 @@
     <name>api-gateway</name>
     <description>api-gateway</description>
 
-        <properties>
-        <java.version>25</java.version>
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
-    </properties>
     <dependencies>
 
         <dependency>
@@ -52,23 +48,19 @@
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
